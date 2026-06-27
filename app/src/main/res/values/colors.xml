@@ -1,0 +1,7 @@
+<resources>
+    <color name="yap_blue">#FF1A4DE6</color>
+    <color name="yap_blue_dark">#FF0F1E4D</color>
+    <color name="yap_orange">#FFFF8C00</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="black">#FF000000</color>
+</resources>

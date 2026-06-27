@@ -1,0 +1,8 @@
+<resources>
+    <!-- Base application theme. Compose drives the real styling; this just
+         provides a no-action-bar window for the host Activity. -->
+    <style name="Theme.YapText" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@android:color/white</item>
+        <item name="android:statusBarColor">@color/white</item>
+    </style>
+</resources>
