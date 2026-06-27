@@ -1,0 +1,28 @@
+name: Mirror to moshbari
+
+# Keeps moshbari/yaptext-android-app in sync with this repo.
+# On every push to main, the latest code is copied to moshbari.
+#
+# Requires a repo secret named MIRROR_TOKEN: a Personal Access Token from the
+# moshbari account with Contents: Read and write on moshbari/yaptext-android-app.
+# You can also run it manually from the Actions tab (Run workflow).
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Push to moshbari (fast-forward only — never overwrites)
+        run: |
+          git push \
+            "https://x-access-token:${{ secrets.MIRROR_TOKEN }}@github.com/moshbari/yaptext-android-app.git" \
+            HEAD:main
