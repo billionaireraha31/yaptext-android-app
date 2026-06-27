@@ -20,6 +20,9 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          # Don't keep the default github-actions token in git config, so the
+          # push below uses MIRROR_TOKEN (the moshbari key) instead.
+          persist-credentials: false
 
       - name: Push to moshbari (fast-forward only — never overwrites)
         run: |
