@@ -29,6 +29,26 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     private val _polishError = MutableStateFlow<String?>(null)
     val polishError = _polishError.asStateFlow()
 
+    /** Editable copy of the transcription — the user can fix words before polishing. */
+    private val _editableText = MutableStateFlow("")
+    val editableText = _editableText.asStateFlow()
+    private var lastSeeded = ""
+
+    init {
+        // Seed the editor each time a NEW transcription arrives (status-only
+        // updates keep the same text, so user edits aren't clobbered).
+        viewModelScope.launch {
+            transcriptionState.collect { st ->
+                if (st.transcribedText != lastSeeded) {
+                    lastSeeded = st.transcribedText
+                    _editableText.value = st.transcribedText
+                }
+            }
+        }
+    }
+
+    fun onEditText(text: String) { _editableText.value = text }
+
     private val _language = MutableStateFlow(AppStorage.language)
     val language = _language.asStateFlow()
 
@@ -47,7 +67,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun polish(tone: Tone) {
-        val text = transcriptionState.value.transcribedText
+        val text = _editableText.value.ifBlank { transcriptionState.value.transcribedText }
         if (text.isBlank()) return
         _isPolishing.value = true
         _polishedText.value = ""

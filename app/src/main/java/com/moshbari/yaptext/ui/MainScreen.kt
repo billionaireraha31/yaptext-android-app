@@ -50,6 +50,7 @@ fun YapTextRoot(
     val polished by vm.polishedText.collectAsState()
     val isPolishing by vm.isPolishing.collectAsState()
     val polishError by vm.polishError.collectAsState()
+    val editableText by vm.editableText.collectAsState()
     val language by vm.language.collectAsState()
     val isPro by vm.isPro.collectAsState()
     val trialTick by vm.trialTick.collectAsState()
@@ -147,7 +148,8 @@ fun YapTextRoot(
             if (state.transcribedText.isNotEmpty()) {
                 Spacer(Modifier.height(24.dp))
                 ResultsSection(
-                    original = state.transcribedText,
+                    original = editableText,
+                    onOriginalChange = vm::onEditText,
                     polished = polished,
                     isPolishing = isPolishing,
                     polishError = polishError,
@@ -295,6 +297,7 @@ private fun RecordingIndicator() {
 @Composable
 private fun ResultsSection(
     original: String,
+    onOriginalChange: (String) -> Unit,
     polished: String,
     isPolishing: Boolean,
     polishError: String?,
@@ -308,7 +311,7 @@ private fun ResultsSection(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         if (polished.isEmpty()) {
-            TextCard("Original", original, MaterialTheme.colorScheme.onSurfaceVariant)
+            EditableTextCard("Original (tap to edit)", original, onOriginalChange)
         } else {
             TextCard("Polished", polished, YapGreen)
         }
@@ -358,6 +361,22 @@ private fun TextCard(label: String, text: String, accent: Color) {
         ) {
             Text(text, modifier = Modifier.verticalScroll(rememberScrollState()).padding(16.dp))
         }
+    }
+}
+
+/** Editable transcription — fix misheard words here before polishing. */
+@Composable
+private fun EditableTextCard(label: String, text: String, onChange: (String) -> Unit) {
+    Column {
+        Text(label.uppercase(), style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+        Spacer(Modifier.height(6.dp))
+        OutlinedTextField(
+            value = text,
+            onValueChange = onChange,
+            modifier = Modifier.fillMaxWidth().heightIn(min = 96.dp, max = 240.dp),
+            textStyle = MaterialTheme.typography.bodyLarge,
+        )
     }
 }
 
