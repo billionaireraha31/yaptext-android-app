@@ -33,35 +33,32 @@ object Config {
     /**
      * JVZoo hosted checkout URL for YapText Pro. Tapping "Upgrade" opens this
      * in the browser. After purchase the buyer receives a license key which
-     * they enter in the app to unlock Pro (see LicenseService).
-     *
-     * TODO: replace with the real JVZoo product/checkout link.
+     * they enter in the app; the app verifies it against the server.
      */
     // TODO(you): paste your real JVZoo checkout link here after you create
     // the "YapText Pro" product in your JVZoo seller dashboard.
     const val JVZOO_CHECKOUT_URL = "https://www.jvzoo.com/b/0/000000/2"
 
-    /**
-     * Unlock code buyers type into the app after purchasing on JVZoo.
-     *
-     * Set this on JVZoo's "Thank-you / delivery" page (the message buyers
-     * see right after paying) so each customer gets the code. Change the
-     * value below to whatever you want it to be, then send a new build.
-     *
-     * NOTE: this is a shared code — anyone with it can unlock Pro, so it can
-     * be passed around. It's the simplest option with no server. For
-     * per-customer, non-shareable unlocks you'd verify each JVZoo license on
-     * your server instead (see LicenseService for that path).
-     */
-    const val PRO_UNLOCK_CODE = "YAPTEXT-PRO-2026"
+    // MARK: - License verification (Supabase — shared with the web app)
 
     /**
-     * (Advanced / optional) Server endpoint that validates a per-customer
-     * JVZoo license. Unused while PRO_UNLOCK_CODE is in effect; kept for the
-     * future secure path. Expects POST { "license": "<key>" } with the
-     * X-App-Secret header, returns 200 { "valid": true } for paid purchases.
+     * Supabase project that issues + verifies JVZoo license keys. Same project
+     * the web app uses. The anon key is a publishable key (safe to embed — the
+     * web app already ships it to every browser).
      */
-    const val LICENSE_VERIFY_PATH = "/verify-license"
+    const val SUPABASE_URL = "https://cgogrstoqhmzkuxvcakk.supabase.co"
+    const val SUPABASE_ANON_KEY =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNnb2dyc3RvcWhtemt1eHZjYWtrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQxMjIwNTgsImV4cCI6MjA3OTY5ODA1OH0.JFKWm9SJarBlPia0oNO5ZG-lfb9y4OlVu2CIB0mnfvg"
+
+    /** Edge function the app calls to check a license key. */
+    const val LICENSE_VERIFY_URL = "$SUPABASE_URL/functions/v1/verify-license"
+
+    /**
+     * Offline fallback unlock code. Used only if the server can't be reached
+     * (e.g. before the edge functions are deployed). Set to "" to disable once
+     * real JVZoo license verification is live.
+     */
+    const val PRO_UNLOCK_CODE_FALLBACK = "YAPTEXT-PRO-2026"
 
     // MARK: - Recording limits
 

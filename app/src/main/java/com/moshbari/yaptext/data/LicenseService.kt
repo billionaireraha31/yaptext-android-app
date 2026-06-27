@@ -11,20 +11,19 @@ import org.json.JSONObject
 /**
  * JVZoo license verification.
  *
- * YapText Pro is sold through JVZoo (external checkout). After buying, the
- * customer receives a license key which they enter in the app. We validate
- * it against the YapText server, which is expected to confirm the key with
- * JVZoo's transaction API and return { "valid": true }.
- *
- * NOTE: the server route ([Config.LICENSE_VERIFY_PATH]) still needs to be
- * implemented. Until it exists this fails closed (returns Invalid), so only
- * the free trial works — no accidental free unlocks.
+ * YapText Pro is sold through JVZoo on the web app. On purchase, the JVZoo
+ * webhook (Supabase function `jvzoo-delivery`) generates a unique license key
+ * and shows/emails it to the buyer. The buyer types that key into the Android
+ * app; this service checks it against the Supabase `verify-license` function,
+ * which confirms the key exists and is active (not refunded).
  */
 class LicenseService {
 
     sealed interface Result {
         object Valid : Result
         data class Invalid(val message: String) : Result
+        /** Network/unknown failure — caller may fall back to the offline code. */
+        data class Unreachable(val message: String) : Result
     }
 
     suspend fun verify(licenseKey: String): Result = withContext(Dispatchers.IO) {
@@ -34,8 +33,9 @@ class LicenseService {
         val payload = JSONObject().put("license", key).toString()
 
         val request = Request.Builder()
-            .url("${Config.API_BASE_URL}${Config.LICENSE_VERIFY_PATH}")
-            .addHeader("X-App-Secret", Config.APP_SECRET)
+            .url(Config.LICENSE_VERIFY_URL)
+            .addHeader("apikey", Config.SUPABASE_ANON_KEY)
+            .addHeader("Authorization", "Bearer ${Config.SUPABASE_ANON_KEY}")
             .post(payload.toRequestBody("application/json".toMediaType()))
             .build()
 
@@ -45,16 +45,14 @@ class LicenseService {
                 val valid = body
                     ?.let { runCatching { JSONObject(it).optBoolean("valid", false) }.getOrNull() }
                     ?: false
-
                 when {
                     response.code == 200 && valid -> Result.Valid
                     response.code == 200 -> Result.Invalid("That license key wasn't recognized.")
-                    response.code == 404 -> Result.Invalid("License check is not available yet. Please contact support.")
-                    else -> Result.Invalid("Couldn't verify right now (${response.code}). Try again.")
+                    else -> Result.Unreachable("Couldn't verify right now (${response.code}).")
                 }
             }
         } catch (e: Exception) {
-            Result.Invalid("Network error: ${e.localizedMessage ?: "unknown"}")
+            Result.Unreachable("Network error: ${e.localizedMessage ?: "unknown"}")
         }
     }
 }

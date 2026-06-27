@@ -61,19 +61,36 @@ object SubscriptionManager {
 
     // MARK: - Unlock via JVZoo license
 
+    /**
+     * Verify a JVZoo license key against the server and unlock Pro on success.
+     * The master offline code (Config.PRO_UNLOCK_CODE_FALLBACK) also unlocks —
+     * useful for the owner and before the edge functions are deployed.
+     * Returns only Valid/Invalid so the paywall UI stays simple.
+     */
     suspend fun redeemLicense(key: String): LicenseService.Result {
         val entered = key.trim()
-        if (entered.isEmpty()) return LicenseService.Result.Invalid("Enter your unlock code")
+        if (entered.isEmpty()) return LicenseService.Result.Invalid("Enter your license key")
 
-        // Simple shared-code unlock (no server needed). Compare case-insensitively
-        // so "yaptext-pro-2026" and "YAPTEXT-PRO-2026" both work.
-        return if (entered.equals(Config.PRO_UNLOCK_CODE, ignoreCase = true)) {
-            AppStorage.isPro = true
-            AppStorage.licenseKey = entered
-            _isPro.value = true
-            LicenseService.Result.Valid
-        } else {
-            LicenseService.Result.Invalid("That code wasn't recognized. Check the code from your purchase.")
+        val fallback = Config.PRO_UNLOCK_CODE_FALLBACK
+        if (fallback.isNotEmpty() && entered.equals(fallback, ignoreCase = true)) {
+            grantPro(entered)
+            return LicenseService.Result.Valid
         }
+
+        return when (val result = licenseService.verify(entered)) {
+            is LicenseService.Result.Valid -> {
+                grantPro(entered)
+                LicenseService.Result.Valid
+            }
+            is LicenseService.Result.Invalid -> result
+            is LicenseService.Result.Unreachable ->
+                LicenseService.Result.Invalid("Couldn't reach the server. Check your connection and try again.")
+        }
+    }
+
+    private fun grantPro(key: String) {
+        AppStorage.isPro = true
+        AppStorage.licenseKey = key
+        _isPro.value = true
     }
 }

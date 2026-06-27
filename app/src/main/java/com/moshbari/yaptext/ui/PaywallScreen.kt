@@ -104,7 +104,7 @@ fun PaywallScreen(onClose: () -> Unit) {
             OutlinedTextField(
                 value = license,
                 onValueChange = { license = it; message = null },
-                label = { Text("Unlock code") },
+                label = { Text("License key") },
                 singleLine = true,
                 enabled = !verifying,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
@@ -119,6 +119,7 @@ fun PaywallScreen(onClose: () -> Unit) {
                         when (val r = SubscriptionManager.redeemLicense(license)) {
                             is LicenseService.Result.Valid -> unlocked = true
                             is LicenseService.Result.Invalid -> message = r.message
+                            is LicenseService.Result.Unreachable -> message = r.message
                         }
                         verifying = false
                     }
