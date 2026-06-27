@@ -79,19 +79,34 @@ fun PaywallScreen(onClose: () -> Unit) {
             Spacer(Modifier.height(16.dp))
             Button(onClick = onClose, modifier = Modifier.fillMaxWidth()) { Text("Start using Pro") }
         } else {
-            // Step 1 — buy on JVZoo
+            // Step 1 — choose a plan and buy on JVZoo
             Button(
                 onClick = {
                     context.startActivity(
-                        Intent(Intent.ACTION_VIEW, Uri.parse(Config.JVZOO_CHECKOUT_URL))
+                        Intent(Intent.ACTION_VIEW, Uri.parse(Config.JVZOO_YEARLY_URL))
                     )
                 },
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text("Get YapText Pro", fontWeight = FontWeight.Bold)
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(Config.YEARLY_PRICE_LABEL, fontWeight = FontWeight.Bold)
+                    Text("Best value", style = MaterialTheme.typography.labelSmall)
+                }
             }
             Spacer(Modifier.height(8.dp))
-            Text("Opens secure JVZoo checkout in your browser.",
+            OutlinedButton(
+                onClick = {
+                    context.startActivity(
+                        Intent(Intent.ACTION_VIEW, Uri.parse(Config.JVZOO_MONTHLY_URL))
+                    )
+                },
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(Config.MONTHLY_PRICE_LABEL, fontWeight = FontWeight.SemiBold)
+            }
+            Spacer(Modifier.height(8.dp))
+            Text("Opens secure JVZoo checkout in your browser. After paying, " +
+                "enter the license key you receive below.",
                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
 
             Spacer(Modifier.height(24.dp))

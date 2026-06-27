@@ -35,9 +35,11 @@ object Config {
      * in the browser. After purchase the buyer receives a license key which
      * they enter in the app; the app verifies it against the server.
      */
-    // TODO(you): paste your real JVZoo checkout link here after you create
-    // the "YapText Pro" product in your JVZoo seller dashboard.
-    const val JVZOO_CHECKOUT_URL = "https://www.jvzoo.com/b/0/000000/2"
+    // JVZoo checkout links for the two YapText Pro plans.
+    const val JVZOO_MONTHLY_URL = "https://www.jvzoo.com/b/0/444195/6"
+    const val JVZOO_YEARLY_URL = "https://www.jvzoo.com/b/0/444219/6"
+    const val MONTHLY_PRICE_LABEL = "Monthly — \$9.97"
+    const val YEARLY_PRICE_LABEL = "Yearly — \$97.99"
 
     // MARK: - License verification (Supabase — shared with the web app)
 
