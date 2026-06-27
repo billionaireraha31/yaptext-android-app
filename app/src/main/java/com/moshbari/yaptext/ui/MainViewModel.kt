@@ -49,6 +49,9 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
 
     fun onEditText(text: String) { _editableText.value = text }
 
+    /** Let the user tweak the AI-polished result before using it. */
+    fun onEditPolished(text: String) { _polishedText.value = text }
+
     private val _language = MutableStateFlow(AppStorage.language)
     val language = _language.asStateFlow()
 

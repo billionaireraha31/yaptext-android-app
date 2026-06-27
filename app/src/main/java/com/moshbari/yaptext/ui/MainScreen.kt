@@ -151,6 +151,7 @@ fun YapTextRoot(
                     original = editableText,
                     onOriginalChange = vm::onEditText,
                     polished = polished,
+                    onPolishedChange = vm::onEditPolished,
                     isPolishing = isPolishing,
                     polishError = polishError,
                     showTonePicker = showTonePicker,
@@ -299,6 +300,7 @@ private fun ResultsSection(
     original: String,
     onOriginalChange: (String) -> Unit,
     polished: String,
+    onPolishedChange: (String) -> Unit,
     isPolishing: Boolean,
     polishError: String?,
     showTonePicker: Boolean,
@@ -313,7 +315,7 @@ private fun ResultsSection(
         if (polished.isEmpty()) {
             EditableTextCard("Original (tap to edit)", original, onOriginalChange)
         } else {
-            TextCard("Polished", polished, YapGreen)
+            EditableTextCard("Polished (tap to edit)", polished, onPolishedChange, accent = YapGreen)
         }
 
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -364,12 +366,17 @@ private fun TextCard(label: String, text: String, accent: Color) {
     }
 }
 
-/** Editable transcription — fix misheard words here before polishing. */
+/** Editable text card — used for both the raw transcription and the polished result. */
 @Composable
-private fun EditableTextCard(label: String, text: String, onChange: (String) -> Unit) {
+private fun EditableTextCard(
+    label: String,
+    text: String,
+    onChange: (String) -> Unit,
+    accent: Color = MaterialTheme.colorScheme.primary,
+) {
     Column {
         Text(label.uppercase(), style = MaterialTheme.typography.labelSmall,
-            fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+            fontWeight = FontWeight.Bold, color = accent)
         Spacer(Modifier.height(6.dp))
         OutlinedTextField(
             value = text,
