@@ -1,0 +1,15 @@
+# Normalize text to LF in the repo.
+* text=auto eol=lf
+
+# Shell script must stay LF even on Windows checkouts.
+gradlew text eol=lf
+*.kt   text eol=lf
+*.kts  text eol=lf
+*.xml  text eol=lf
+*.md   text eol=lf
+
+# Windows batch + binaries.
+gradlew.bat text eol=crlf
+*.jar  binary
+*.png  binary
+*.keystore binary
