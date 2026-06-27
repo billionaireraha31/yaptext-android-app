@@ -62,12 +62,18 @@ object SubscriptionManager {
     // MARK: - Unlock via JVZoo license
 
     suspend fun redeemLicense(key: String): LicenseService.Result {
-        val result = licenseService.verify(key)
-        if (result is LicenseService.Result.Valid) {
+        val entered = key.trim()
+        if (entered.isEmpty()) return LicenseService.Result.Invalid("Enter your unlock code")
+
+        // Simple shared-code unlock (no server needed). Compare case-insensitively
+        // so "yaptext-pro-2026" and "YAPTEXT-PRO-2026" both work.
+        return if (entered.equals(Config.PRO_UNLOCK_CODE, ignoreCase = true)) {
             AppStorage.isPro = true
-            AppStorage.licenseKey = key.trim()
+            AppStorage.licenseKey = entered
             _isPro.value = true
+            LicenseService.Result.Valid
+        } else {
+            LicenseService.Result.Invalid("That code wasn't recognized. Check the code from your purchase.")
         }
-        return result
     }
 }

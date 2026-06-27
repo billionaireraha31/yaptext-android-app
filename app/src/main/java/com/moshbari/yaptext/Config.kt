@@ -37,16 +37,29 @@ object Config {
      *
      * TODO: replace with the real JVZoo product/checkout link.
      */
+    // TODO(you): paste your real JVZoo checkout link here after you create
+    // the "YapText Pro" product in your JVZoo seller dashboard.
     const val JVZOO_CHECKOUT_URL = "https://www.jvzoo.com/b/0/000000/2"
 
     /**
-     * Server endpoint that validates a JVZoo license key for this device.
-     * Expected: POST { "license": "<key>" } with X-App-Secret header,
-     * returns 200 { "valid": true } when the key is a paid, active purchase.
+     * Unlock code buyers type into the app after purchasing on JVZoo.
      *
-     * TODO: implement this route on the Railway server (it can call the
-     * JVZoo transaction/IPN API to confirm the key). Until then, license
-     * unlock will fail closed and only the free trial works.
+     * Set this on JVZoo's "Thank-you / delivery" page (the message buyers
+     * see right after paying) so each customer gets the code. Change the
+     * value below to whatever you want it to be, then send a new build.
+     *
+     * NOTE: this is a shared code — anyone with it can unlock Pro, so it can
+     * be passed around. It's the simplest option with no server. For
+     * per-customer, non-shareable unlocks you'd verify each JVZoo license on
+     * your server instead (see LicenseService for that path).
+     */
+    const val PRO_UNLOCK_CODE = "YAPTEXT-PRO-2026"
+
+    /**
+     * (Advanced / optional) Server endpoint that validates a per-customer
+     * JVZoo license. Unused while PRO_UNLOCK_CODE is in effect; kept for the
+     * future secure path. Expects POST { "license": "<key>" } with the
+     * X-App-Secret header, returns 200 { "valid": true } for paid purchases.
      */
     const val LICENSE_VERIFY_PATH = "/verify-license"
 

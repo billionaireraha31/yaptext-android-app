@@ -104,7 +104,7 @@ fun PaywallScreen(onClose: () -> Unit) {
             OutlinedTextField(
                 value = license,
                 onValueChange = { license = it; message = null },
-                label = { Text("License key") },
+                label = { Text("Unlock code") },
                 singleLine = true,
                 enabled = !verifying,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
